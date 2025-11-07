@@ -1,4 +1,4 @@
-import groovy.json.JsonSlurper
+ import groovy.json.JsonSlurper
 
 def getFtpPublishProfile(def publishProfilesJson) {
   def pubProfiles = new JsonSlurper().parseText(publishProfilesJson)
@@ -23,7 +23,7 @@ node {
       def webAppName = 'gmz-cc8'
       // login Azure
       withCredentials([usernamePassword(credentialsId: 'AzureServicePrincipal', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
-       sh "az webapp deploy --resource-group ${resourceGroup} " +"--name ${webAppName} --src-path target/calculator-1.0.war --type war"
+       sh "az webapp deploy --resource-group ${resourceGroup} " + "--name ${webAppName} --src-path target/calculator-1.0.war --type war"
       }
       // get publish settings
       def pubProfilesJson = sh script: "az webapp deployment list-publishing-profiles -g $resourceGroup -n $webAppName", returnStdout: true
