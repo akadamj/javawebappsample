@@ -8,8 +8,8 @@ def getFtpPublishProfile(def publishProfilesJson) {
 }
 
 node {
-  withEnv(['AZURE_SUBSCRIPTION_ID=<subscription_id>',
-        'AZURE_TENANT_ID=<tenant_id>']) {
+  withEnv(['AZURE_SUBSCRIPTION_ID=08df1ebf-aa0e-4c94-9a0b-f34b97c7da9f',
+        'AZURE_TENANT_ID=9fd391f0-58a7-4d8f-baf7-53056e2ff285']) {
     stage('init') {
       checkout scm
     }
@@ -19,17 +19,17 @@ node {
     }
   
     stage('deploy') {
-      def resourceGroup = '<resource_group>'
-      def webAppName = '<app_name>'
+      def resourceGroup = 'jenkins-get-started-rg'
+      def webAppName = 'gmz-cc8'
       // login Azure
-      withCredentials([usernamePassword(credentialsId: '<service_princial>', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
+      withCredentials([usernamePassword(credentialsId: 'AzureServicePrincipal', passwordVariable: 't0f8Q~h7nS_yIOLCglQz6Nd6uE7Ka8abaI1RYc7~', usernameVariable: 'b8bab622-cd29-4cf0-b555-03b58166b348')]) {
        sh '''
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
           az account set -s $AZURE_SUBSCRIPTION_ID
         '''
       }
       // get publish settings
-      def pubProfilesJson = sh script: "az webapp deployment list-publishing-profiles -g $resourceGroup -n $webAppName", returnStdout: true
+      def pubProfilesJson = sh script: "az webapp deploy --resource-group ${resourceGroup} " + "--name ${webAppName} --src-path target/calculator-1.0.war --type war", returnStdout: true
       def ftpProfile = getFtpPublishProfile pubProfilesJson
       // upload package
       sh "curl -T target/calculator-1.0.war $ftpProfile.url/webapps/ROOT.war -u '$ftpProfile.username:$ftpProfile.password'"
