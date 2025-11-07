@@ -22,7 +22,7 @@ node {
       def resourceGroup = 'jenkins-get-started-rg'
       def webAppName = 'gmz-cc8'
       // login Azure
-      withCredentials([usernamePassword(credentialsId: 'AzureServicePrincipal', passwordVariable: 't0f8Q~h7nS_yIOLCglQz6Nd6uE7Ka8abaI1RYc7~', usernameVariable: 'b8bab622-cd29-4cf0-b555-03b58166b348')]) {
+      withCredentials([usernamePassword(credentialsId: 'AzureServicePrincipal', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
        sh '''
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
           az account set -s $AZURE_SUBSCRIPTION_ID
