@@ -23,13 +23,18 @@ node {
       def webAppName = 'gmz-cc8'
       // login Azure
       withCredentials([usernamePassword(credentialsId: 'AzureServicePrincipal', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
+       sh '''
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
+          az account set -s $AZURE_SUBSCRIPTION_ID
+        ''' 
+   
        sh "az webapp deploy --resource-group ${resourceGroup} " + "--name ${webAppName} --src-path target/calculator-1.0.war --type war"
       }
       // get publish settings
       def pubProfilesJson = sh script: "az webapp deployment list-publishing-profiles -g $resourceGroup -n $webAppName", returnStdout: true
       def ftpProfile = getFtpPublishProfile pubProfilesJson
       // upload package
-      sh "curl --ssl-reqd --ftp-ssl --ftp-pasv -T target/calculator-1.0.war \"${ftpProfile.url.replaceFirst('^ftps://','ftp://')}/ROOT.war\" -u \"${ftpProfile.username}:${ftpProfile.password}\""
+      sh "curl -T target/calculator-1.0.war $ftpProfile.url/webapps/ROOT.war -u '$ftpProfile.username:$ftpProfile.password'"
       // log out
       sh 'az logout'
     }
